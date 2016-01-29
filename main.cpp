@@ -14,11 +14,11 @@ int main() {
 	key_t key = ftok("/tmp/msg.temp", 0);
 
 	long msgtyp = 0;
-	result = msgrcv(msqid, (void *) &msg, sizeof(msg.text),
+	result = msgrcv(msqid, (void *) &msg, sizeof(msg.mtext),
 		msgtyp, MSG_NOERROR | IPC_NOWAIT);
 		
 	outfile = fopen("message.txt", "w");
-	fprintf(outfile, "%s\n", msg.text);
+	fprintf(outfile, "%s\n", msg.mtext);
 	fclose(outfile);
 	return 0;
 }
