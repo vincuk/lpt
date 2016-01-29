@@ -1,5 +1,6 @@
 #include <sys/msg.h>
 #include <stdio.h>
+#include <iostream>
 
 int main() {
 	FILE *outfile;
@@ -12,11 +13,12 @@ int main() {
 	} msg;
 	
 	key_t key = ftok("/tmp/msg.temp", 0);
-
-	long msgtyp = 0;
-	result = msgrcv(msqid, (void *) &msg, sizeof(msg.mtext),
-		msgtyp, MSG_NOERROR | IPC_NOWAIT);
-		
+	msqid = msgget(key, 0666 | IPC_CREAT);
+	
+	long msgtyp = 2;
+	result = msgrcv(msqid, (void *) &msg, sizeof(msg.mtext), msgtyp, 0);
+	
+	std::cout << msg.mtext << std::endl;
 	outfile = fopen("message.txt", "w");
 	fprintf(outfile, "%s\n", msg.mtext);
 	fclose(outfile);
