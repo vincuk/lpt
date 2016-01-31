@@ -15,7 +15,7 @@ int main() {
 	msqid = msgget(key, 0666 | IPC_CREAT);
 	result = msgrcv(msqid, (void *) &msg, sizeof(msg.mtext), msgtyp, 0);
 
-	int f = open("message.txt", O_RDWR | O_CREAT, 0666);
+	int f = open("/home/box/message.txt", O_RDWR | O_CREAT, 0666);
 	write(f, msg.mtext, sizeof(msg.mtext));
 	close(f);
 	
