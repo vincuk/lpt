@@ -1,11 +1,10 @@
 #include <sys/msg.h>
-#include <stdio.h>
-#include <iostream>
+#include <unistd.h>
 
 int main() {
-	FILE *outfile;
 	int result;
 	int msqid;
+	long msgtyp = 1;
 	
 	struct message {
 		long mtype;
@@ -14,13 +13,13 @@ int main() {
 	
 	key_t key = ftok("/tmp/msg.temp", 0);
 	msqid = msgget(key, 0666 | IPC_CREAT);
-	
-	long msgtyp = 2;
 	result = msgrcv(msqid, (void *) &msg, sizeof(msg.mtext), msgtyp, 0);
+
+	int f = open("message.txt", O_RDWR | O_CREAT, 0666);
+	write(f, msg.mtext, sizeof(msg.mtext));
+	close(f);
 	
-	std::cout << msg.mtext << std::endl;
-	outfile = fopen("message.txt", "w");
-	fprintf(outfile, "%s\n", msg.mtext);
-	fclose(outfile);
 	return 0;
 }
+
+
