@@ -18,7 +18,7 @@ int main() {
 		msgtyp, MSG_NOERROR | IPC_NOWAIT);
 		
 	outfile = fopen("/home/box/message.txt", "w");
-	fprintf(outfile, "%s\n", msg.text);
+	fprintf(outfile, "%s", msg.text);
 	fclose(outfile);
 	return 0;
 }
