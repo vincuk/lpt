@@ -13,7 +13,7 @@ int main() {
 	
 	key_t key = ftok("/tmp/msg.temp", 0);
 
-	long msgtyp = 0;
+	long msgtyp = 1;
 	result = msgrcv(msqid, (void *) &msg, sizeof(msg.text),
 		msgtyp, MSG_NOERROR | IPC_NOWAIT);
 		
