@@ -14,10 +14,10 @@ int main() {
 	} msg;
 	
 	key_t key = ftok("/tmp/msg.temp", 0);
+	msqid = msgget(key, 0666 | IPC_CREAT);
 
 	long msgtyp = 1;
-	while (result <0)
-		result = msgrcv(msqid, (void *) &msg, sizeof(msg.mtext), msgtyp, 0);
+	result = msgrcv(msqid, (void *) &msg, sizeof(msg.mtext), msgtyp, 0);
 		
 	int f = open("/home/box/message.txt", O_RDWR | O_CREAT, 0666);
 	write(f, msg.mtext, result);
