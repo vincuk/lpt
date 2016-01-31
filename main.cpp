@@ -14,8 +14,7 @@ int main() {
 	key_t key = ftok("/tmp/msg.temp", 0);
 
 	long msgtyp = 1;
-	result = msgrcv(msqid, (void *) &msg, sizeof(msg.mtext),
-		msgtyp, MSG_NOERROR | IPC_NOWAIT);
+	result = msgrcv(msqid, (void *) &msg, sizeof(msg.mtext), msgtyp, 0);
 		
 	outfile = fopen("/home/box/message.txt", "w");
 	fprintf(outfile, "%s\n", msg.mtext);
