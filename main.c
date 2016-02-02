@@ -1,27 +1,20 @@
-#include <sys/msg.h>
-#include <unistd.h>
 #include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
+#include <sys/ipc.h>
+#include <sys/sem.h>
 
 int main() {
-	int result;
-	int msqid;
+	key_t key;
+	int cntr;
+    union semun semopts;
+    int   semid;
+    int members = 16;
 	
-	struct message {
-		long mtype;
-		char mtext[80];
-	} msg;
-	
-	key_t key = ftok("/tmp/msg.temp", 0);
-	msqid = msgget(key, 0666 | IPC_CREAT);
+	key = ftok("/tmp/sem.temp", 0);
+	semid = semget(key, members, IPC_CREAT|IPC_EXCL|0666);
 
-	long msgtyp = 1;
-	result = msgrcv(msqid, (void *) &msg, sizeof(msg.mtext), msgtyp, 0);
-		
-	int f = open("/home/box/message.txt", O_RDWR | O_CREAT, 0666);
-	write(f, msg.mtext, result);
-	close(f);
-	
+	for(cntr=0; cntr<members; cntr++) {
+		semopts.val = cntr;
+		semctl(semid, cntr, SETVAL, semopts);
+	}
 	return 0;
 }
