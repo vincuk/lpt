@@ -5,9 +5,13 @@
 int main() {
 	key_t key;
 	int cntr;
-    union semun semopts;
-    int   semid;
-    int members = 16;
+	union semun {
+		int val;
+		struct semid_ds *buf;
+		unsigned short int *array;
+	} semopts;
+	int   semid;
+	int members = 16;
 	
 	key = ftok("/tmp/sem.temp", 0);
 	semid = semget(key, members, IPC_CREAT|IPC_EXCL|0666);
