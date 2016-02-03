@@ -9,7 +9,7 @@ int main() {
 	size_t segsize = 1024*1054*sizeof(char);
 	
 	int shmid = shmget( key, segsize, IPC_CREAT | IPC_EXCL | 0660 );
-	ptr = shmat(shmid, 0, 0); 
+	ptr = (char *) shmat(shmid, 0, 0); 
 	for (int i = 0; i < 1024*1024; i++) {
 		*ptr++ = 42;
 	}
