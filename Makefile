@@ -8,4 +8,4 @@ SRC=main.cpp
 OBJ=main.o
 
 all: $(OBJ)
-	$(CXX) -o $(BIN) $^
+	$(CXX) -o $(BIN) -lpthread $^
