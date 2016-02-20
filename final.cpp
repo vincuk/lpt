@@ -14,6 +14,8 @@
 #include <cstring>
 
 char *dirval = (char *)"/";
+const char *filename = (char *)"/tmp/log.txt";
+FILE *flog;
 
 void not_found(int client) {
 	char buf[1024];
@@ -34,9 +36,8 @@ void not_found(int client) {
 void send_file(int client, FILE *f) {
 	char buf[1024];
 
-	write(client, "HTTP/1.0 200 OK\r\n", 16);
-	write(client, "Content-Type: text/html\r\n\n", 25);
-	write(client, "\r\n", 2);
+	write(client, "HTTP/1.0 200 OK\r\n", 17);
+	write(client, "Content-Type: text/html\r\n\r\n", 27);
 	fgets(buf, sizeof(buf), f);
 	while (!feof(f)) {
 		write(client, buf, strlen(buf));
@@ -55,8 +56,9 @@ void accept_request(void *arg) {
 
 	recv(*client, buffer, bufsize, 0);
 	
-// 	printf("%s\n", buffer);
-	
+	flog = fopen(filename, "a");
+	fprintf(flog, "%s\n", buffer);
+	fclose(flog);
 	i = 0;
 	j = 0;
 	int url_s = strlen(dirval);
@@ -88,19 +90,18 @@ void accept_request(void *arg) {
 		j++;
 		k++;
 	}
-	// if (k == 1) {
-// 		char * index = (char *)"index.html";
-// 		for (j = 0; j < 10; j++) {
-// 			URL[i] = index[j];
-// 			i++;
-// 		}
-// 	}
-	URL[i] = '\0';
-// 	printf("Requested URL: %s\n", URL);
-	if (k <= 1) {
-		not_found(*client);
+	if (k == 1) {
+		char * index = (char *)"index.html";
+		for (j = 0; j < 10; j++) {
+			URL[i] = index[j];
+			i++;
+		}
 	}
-	else if (strcasecmp(method, "GET") == 0) {
+	URL[i] = '\0';
+	flog = fopen(filename, "a");
+	fprintf(flog, "Requested URL: %s\n", URL);
+	fclose(flog);
+	if (strcasecmp(method, "GET") == 0) {
 		FILE *f = NULL;
 		f = fopen(URL, "r");
 		if (f != NULL)
@@ -113,8 +114,8 @@ void accept_request(void *arg) {
 
 int main(int argc, char **argv) {
 	int c;
-	int portval = 15000;
-	char *hostval = (char *)"localhost";
+	int portval = NULL;
+	char *hostval = NULL;
 	while (1) {
 		static struct option long_options[] =
 		{
@@ -141,9 +142,10 @@ int main(int argc, char **argv) {
 				abort ();
 			}
 	}
-	
-// 	printf ("host = %s, port = %d, dir = %s\n", hostval, portval, dirval);
-	
+	flog = fopen(filename, "a");
+	fprintf (flog, "host = %s, port = %d, dir = %s\n", hostval, portval, dirval);
+	fclose(flog);
+
 	pid_t curPID = fork();
  	if (curPID != 0) {
  		exit(0);
@@ -154,8 +156,9 @@ int main(int argc, char **argv) {
 	struct sockaddr_in address;
 	pthread_t newthread;
 
+	flog = fopen(filename, "a");
 	if ((create_socket = socket(AF_INET, SOCK_STREAM, 0)) > 0) {
-// 		printf("The socket was created\n");
+		fprintf(flog, "The socket was created\n");
 	}
 	
 	address.sin_family = AF_INET;
@@ -163,9 +166,10 @@ int main(int argc, char **argv) {
 	address.sin_port = htons(portval);
 	
 	if (bind(create_socket, (struct sockaddr *) &address, sizeof(address)) == 0) {
-// 		printf("Binding Socket\n");
+		fprintf(flog, "Binding Socket\n");
 	}
-	
+	fclose(flog);
+
 	
 	while (1) {
 		if (listen(create_socket, 10) < 0) {
@@ -179,7 +183,9 @@ int main(int argc, char **argv) {
 		}
 	
 		if (new_socket > 0) {
-// 			printf("The Client is connected...\n");
+			flog = fopen(filename, "a");
+			fprintf(flog, "The Client is connected... PID = %d\n", new_socket);
+			fclose(flog);
 		}
 
 		if (pthread_create(&newthread, NULL, (void *(*)(void *))accept_request, (void*)&new_socket) != 0) {
