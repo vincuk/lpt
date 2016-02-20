@@ -81,12 +81,12 @@ void accept_request(void *arg) {
 	method[i] = '\0';
 	i = url_s; 
 	j++;
-// 	int k = 0;
+	int k = 0;
 	while (!isspace(buffer[j]) && (i < sizeof(URL) - 1)) {
 		URL[i] = buffer[j];
 		i++;
 		j++;
-// 		k++;
+		k++;
 	}
 	// if (k == 1) {
 // 		char * index = (char *)"index.html";
@@ -97,8 +97,10 @@ void accept_request(void *arg) {
 // 	}
 	URL[i] = '\0';
 // 	printf("Requested URL: %s\n", URL);
-
-	if (strcasecmp(method, "GET") == 0) {
+	if (k <= 1) {
+		not_found(*client);
+	}
+	else if (strcasecmp(method, "GET") == 0) {
 		FILE *f = NULL;
 		f = fopen(URL, "r");
 		if (f != NULL)
