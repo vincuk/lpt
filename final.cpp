@@ -81,20 +81,20 @@ void accept_request(void *arg) {
 	method[i] = '\0';
 	i = url_s; 
 	j++;
-	int k = 0;
+// 	int k = 0;
 	while (!isspace(buffer[j]) && (i < sizeof(URL) - 1)) {
 		URL[i] = buffer[j];
 		i++;
 		j++;
-		k++;
+// 		k++;
 	}
-	if (k == 1) {
-		char * index = (char *)"index.html";
-		for (j = 0; j < 10; j++) {
-			URL[i] = index[j];
-			i++;
-		}
-	}
+	// if (k == 1) {
+// 		char * index = (char *)"index.html";
+// 		for (j = 0; j < 10; j++) {
+// 			URL[i] = index[j];
+// 			i++;
+// 		}
+// 	}
 	URL[i] = '\0';
 // 	printf("Requested URL: %s\n", URL);
 
