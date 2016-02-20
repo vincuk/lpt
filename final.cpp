@@ -11,6 +11,7 @@
 #include <fcntl.h>
 #include <getopt.h>
 #include <pthread.h>
+#include <cstring>
 
 char *dirval = (char *)"/";
 
