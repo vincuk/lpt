@@ -14,8 +14,6 @@
 #include <cstring>
 
 char *dirval = (char *)"/";
-const char *filename = (char *)"log.txt";
-FILE *flog;
 
 void not_found(int client) {
 	char buf[1024];
@@ -35,16 +33,13 @@ void not_found(int client) {
 
 void send_file(int client, FILE *f) {
 	char buf[1024];
-	flog = fopen(filename, "a");
 	write(client, "HTTP/1.0 200 OK\r\n", 17);
 	write(client, "Content-Type: text/html\r\n\r\n", 27);
 	fgets(buf, sizeof(buf), f);
 	while (!feof(f)) {
-		fprintf(flog, "%d\n", strlen(buf));
 		write(client, buf, strlen(buf));
 		fgets(buf, sizeof(buf), f);
 	}
-	fclose(flog);
 }
 
 void accept_request(void *arg) {
@@ -58,9 +53,6 @@ void accept_request(void *arg) {
 
 	recv(*client, buffer, bufsize, 0);
 	
-	flog = fopen(filename, "a");
-	fprintf(flog, "%s\n", buffer);
-	fclose(flog);
 	i = 0;
 	j = 0;
 	int url_s = strlen(dirval);
@@ -100,9 +92,7 @@ void accept_request(void *arg) {
 		}
 	}
 	URL[i] = '\0';
-	flog = fopen(filename, "a");
-	fprintf(flog, "Requested URL: %s\n", URL);
-	fclose(flog);
+
 	if (strcasecmp(method, "GET") == 0) {
 		FILE *f = NULL;
 		f = fopen(URL, "r");
@@ -144,9 +134,6 @@ int main(int argc, char **argv) {
 				abort ();
 			}
 	}
-	flog = fopen(filename, "a");
-	fprintf (flog, "host = %s, port = %d, dir = %s\n", hostval, portval, dirval);
-	fclose(flog);
 
 	pid_t curPID = fork();
  	if (curPID != 0) {
@@ -158,9 +145,8 @@ int main(int argc, char **argv) {
 	struct sockaddr_in address;
 	pthread_t newthread;
 
-	flog = fopen(filename, "a");
-	if ((create_socket = socket(AF_INET, SOCK_STREAM, 0)) > 0) {
-		fprintf(flog, "The socket was created\n");
+	if ((create_socket = socket(AF_INET, SOCK_STREAM, 0)) <= 0) {
+		exit(1);
 	}
 	
 	address.sin_family = AF_INET;
@@ -168,9 +154,8 @@ int main(int argc, char **argv) {
 	address.sin_port = htons(portval);
 	
 	if (bind(create_socket, (struct sockaddr *) &address, sizeof(address)) == 0) {
-		fprintf(flog, "Binding Socket\n");
+// 		exit(1);
 	}
-	fclose(flog);
 
 	
 	while (1) {
@@ -182,12 +167,6 @@ int main(int argc, char **argv) {
 		if ((new_socket = accept(create_socket, (struct sockaddr *) &address, &addrlen)) < 0) {
 			perror("server: accept");
 			exit(1);
-		}
-	
-		if (new_socket > 0) {
-			flog = fopen(filename, "a");
-			fprintf(flog, "The Client is connected... PID = %d\n", new_socket);
-			fclose(flog);
 		}
 
 		if (pthread_create(&newthread, NULL, (void *(*)(void *))accept_request, (void*)&new_socket) != 0) {
