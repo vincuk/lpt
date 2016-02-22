@@ -34,7 +34,9 @@ void not_found(int client) {
 void send_file(int client, FILE *f) {
 	char buf[1024];
 	write(client, "HTTP/1.0 200 OK\r\n", 17);
-	write(client, "Content-Type: text/html\r\n\r\n", 27);
+	write(client, "Connection: close\r\n", 19);
+	write(client, "Content-Type: text/html\r\n", 25);
+	write(client, "\r\n", 2);
 	fgets(buf, sizeof(buf), f);
 	while (!feof(f)) {
 		write(client, buf, strlen(buf));
@@ -78,7 +80,7 @@ void accept_request(void *arg) {
 	i = url_s; 
 	j++;
 	int k = 0;
-	while (!isspace(buffer[j]) && (i < sizeof(URL) - 1)) {
+	while (!isspace(buffer[j]) && (buffer[j] !='?')) {
 		URL[i] = buffer[j];
 		i++;
 		j++;
